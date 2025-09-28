@@ -6,10 +6,9 @@ import os
 from pynput import keyboard
 from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController
-#I am going to give you raw information and you are going to process it in to groups(Link, Car, Total, Miles, MPG, Year, Price, Fees, Damage)
-
 keyboard_controller  = KeyboardController()
 mouse_controller = MouseController()
+
 carnum = 0
 
 #stop and start button
@@ -105,6 +104,7 @@ listener = keyboard.Listener(on_press=on_press)
 listener.start()
 run = False
 main_program()
+
 
 
 
