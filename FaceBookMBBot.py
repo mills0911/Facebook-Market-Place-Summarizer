@@ -1,42 +1,33 @@
-
-import time, sys
+import time
 import pyautogui
 import pyperclip
-import os
 from pynput import keyboard
+import keyboard as key
 from pynput.keyboard import Key, Controller as KeyboardController
-from pynput.mouse import Button, Controller as MouseController
+from pynput.mouse import Controller as MouseController
+#I am going to give you raw information and you are going to process it in to groups(Link, Car, Total, Miles, MPG, Year, Price, Fees, Damage)
+
 keyboard_controller  = KeyboardController()
 mouse_controller = MouseController()
-
 carnum = 0
 
 #stop and start button
 def on_press(key):
+    time.sleep(.1)
     global run
     try:
         if key.char == '=':
             run = True
-        if key.char == '-':
+        elif key.char == '-':
             run = False
     except AttributeError:
         pass
 
 
-
-# Define postionholder as a list of lists before using it
-postionholder = [[170, 620], [533, 633], [929, 625], [143, 1180], [530, 1183], [930, 1180]]
-
-def post_clicker(i):
-    pyautogui.click(*postionholder[i])
-    time.sleep(4)
-
-
-def copy():
+def copy_selectedText():
     keyboard_controller.press(Key.ctrl)
     keyboard_controller.tap("c")
     keyboard_controller.release(Key.ctrl)
-
 
 def writeToFile(text):
     with open("rawoutput.txt", "a", encoding="utf-8") as file:
@@ -46,65 +37,104 @@ def clipBoardtoFile():
     text = pyperclip.paste()
     writeToFile(text)
 
+def previuosPage():
+    keyboard_controller.press(Key.alt)
+    keyboard_controller.tap(Key.left)
+    keyboard_controller.release(Key.alt)
+
+def control_Plus_Key(key):
+    keyboard_controller.press(Key.ctrl)
+    keyboard_controller.tap(key)
+    keyboard_controller.release(Key.ctrl)
+
+def get_Positions_USER(run_once):
+    space_was_pressed = False
+    positionholder = []
+    while True:
+        time.sleep(.02)
+        if key.is_pressed("shift"):
+            if not space_was_pressed: #preventing holding
+                tempX, tempY = pyautogui.position()
+                print("Position ["+str(len(positionholder)+1) +"] = {" + str(tempX)+", "+ str(tempY)+"}")
+                positionholder.append([tempX, tempY]) 
+                space_was_pressed = True
+                if run_once:
+                    return positionholder
+        else:
+            space_was_pressed = False
+        
+        if key.is_pressed("esc") and not run_once:
+            return positionholder
+
+    
+
+
+
 def main_program():
-    print("To start Press = To start Press - to stop")
     global run
     global carnum
-    print("running ")
+
+    #introduction
+    print("This program requires you to open Facebook Marketplace and set the positions of each post, once that is done it will automate the rest\nPress SHIFT on the location of each post and Press ESC= when you are done.")
+    
+    #Gets Post Positions
+    positionholder = get_Positions_USER(False) #stores as ([x,y],[x,y],ect)
+    time.sleep(.1)
+
+    #give user info of how to use
+    print("\n\nNow we have to positions of the post saved ")
+    print("run the program when ready")
+    print("To start Press = To start Press - to stop")
+    
+
+    #AUTO-Post-clicker
+    while True:  
+        for i in range(len(positionholder)):
+            #Check if running
+            if not run:
+                break
+
+            #click on of the post          
+            pyautogui.click(*positionholder[i])
+            print("clicked post")
+
+            #time to wait for link to load
+            time.sleep(4)
 
 
-    while True:
-        if run:
-            print("running run loop")
-            for i in range (6):
-                if run:
-                    #click on of the post
-                    post_clicker(i)
-                    print("clicked post")
+            # Copying post
+            control_Plus_Key("a")         #Ctrl A
+            print("pressed ctrl a") 
+            time.sleep(.05)
+            copy_selectedText()
+  
+            #Pasting Post
+            carnum += 1
+            writeToFile("["+str(carnum)+"]")
+            clipBoardtoFile()
+            print("copied and pasted post")
 
-                    # Ctrl A
-                    keyboard_controller.press(Key.ctrl)
-                    keyboard_controller.tap("a")
-                    keyboard_controller.release(Key.ctrl)
-                    print("pressed ctrl a") 
-                    time.sleep(.1)
+            # Copying and pasting the Link
+            control_Plus_Key("l")
+            copy_selectedText()
+            time.sleep(.1) 
+            writeToFile("\n{")
+            clipBoardtoFile()
+            writeToFile("}\n\n\n")
 
-                    # Copying and pasting the post
-                    copy()
-                    time.sleep(.1)
-                    carnum += 1
-                    writeToFile("["+str(carnum)+"]")
-                    clipBoardtoFile()
-                    time.sleep(.1)
-                    print("copied and pasted post")
+            print("copied and pasted link")
 
-                    # Copying and pasting the Link
-                    pyautogui.click(280,100)
-                    copy()
-                    time.sleep(.1) 
-                    writeToFile("\n{")
-                    clipBoardtoFile()
-                    writeToFile("}\n\n\n")
+            #back To previous Page
+            previuosPage()
+            print("went back to main page" + str(i))
 
-                    time.sleep(.1)
-                    print("copied and pasted link")
+        run=False 
 
-                    # Going back to main page 
-                    time.sleep(1)
-                    pyautogui.click(30,96)
-                    time.sleep(.1)
-                    print("went back to main page" + str(i))
-            run = False
-
-
-
-        time.sleep(.1)
-        
 listener = keyboard.Listener(on_press=on_press) 
 listener.start()
+
 run = False
 main_program()
-
 
 
 
