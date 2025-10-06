@@ -1,21 +1,23 @@
 from pynput import keyboard
 import time, sys
 import pyautogui
+import os
+
 def find(text, location):
     global contents 
-    
-    global position
-    if text in contents:
-        position = contents.find(text, location + 1)
+    #find text starting from location 
+    position = contents.find(text, location + 1)
+    if position == -1:
+        print(str(text)+"NOT FOUND")
+        return location
+    else:
         print("Found:" +str(text) + " at position " + str(position))
         return position
         
-    else:
-        print("Not found:", text)
-        return False
 
 def writeToFile(text):
-    with open("C:\\Users\\nadinesyamat\\OneDrive\\Desktop\\Programs\\Facebook Post Summarizer\\formatedOutput.txt", "a", encoding="utf-8") as file:
+    global formatfile
+    with open(formatfile, "a", encoding="utf-8") as file:
         file.write(text)
         
 def nextInput():
@@ -27,43 +29,62 @@ def findEnd(text, position):
 def nextCar():
     writeToFile("\n")
 
-
+"""""
 class Post(year, brand):
     def __init__(curr, name, breed):
         curr.name = name
         curr.breed = breed
-        
+        """""
     
 
 
 def main_program():
-    location = 0
+    location = 0 #before text location
+    locationend = 0 #after text location
+    global rawfile, formatfile
     
-    for i in range(1, 109, 1):
-        print("To start Press = To start Press - to stop")
+    #get dir of current file 
+    base_path = os.path.dirname(os.path.abspath(__file__))   
+    
+    #set location of file
+    rawfile = os.path.join(base_path, "rawoutput.txt")
+    formatfile = os.path.join(base_path, "formatedOutput.txt")
+
+    #get raw file
+    with open(rawfile, "r", encoding="utf-8") as file:
+        global contents
+        contents = file.read()
+    i=1
+    while (contents.find(f'[{i}]', location) != -1):
+        location+=1
         print(location)
         
         #get Year made
-        location = (findEnd("\n20", location)+1) - 3
-        writeToFile(contents[location:contents.find(" ", location)])
+        location = contents.find(']', location)+1
+        locationend = contents.find(" ", location)
+        writeToFile(contents[location:locationend])
         print(location)
         nextInput()
+        
 
         #get Brand
-        writeToFile(contents[location:contents.find(" ", location)])
-        location = contents.find(" ", location)
+        location = contents.find(" ", location)+1
+        locationend = contents.find(" ", location)
+        writeToFile(contents[location:locationend])
         nextInput()
         print(location)
 
         #get name
+        location = locationend+1
         writeToFile(contents[location:contents.find("\n", location)])
         location = contents.find("\n", location)-1
         nextInput()
         print(location)
 
         #get Price
-        writeToFile(contents[contents.find('$', location):contents.find("L", location)-1])
-        location = contents.find("\n", location)
+        location = contents.find('$', location)
+        locationend = contents.find("\n", location)
+        writeToFile(contents[location:locationend])
         nextInput()
         print(location)
 
@@ -81,24 +102,26 @@ def main_program():
 
         #get Interior color
         location = findEnd("Interior color:", location)+1
-        writeToFile(contents[location:contents.find("\n", location)])
+        locationend = contents.find("\n", location)
+        writeToFile(contents[location:locationend])
         nextInput()
         print(location)
 
         #get link
         location = findEnd("{", location)
-        writeToFile(contents[location:contents.find("}", location)])
-        location = find("}",location)-6
+        locationend =contents.find("}", location)
+        writeToFile(contents[location:locationend])
+        
         nextInput()
         print(location)
 
         #nextcar
         nextCar()
+        i+=1
 
 
 
 position = 0
-with open("C:\\Users\\nadinesyamat\\OneDrive\\Desktop\\Programs\\Facebook Post Summarizer\\rawoutput.txt", "r", encoding="utf-8") as file:
-    global contents
-    contents = file.read()
+
+
 main_program()
