@@ -1,6 +1,6 @@
 README
 
-This Project is meant to be used to go through facebook market place and sort data. 
+This Project is meant to be used to go through facebook market place(for cars) and sort data. 
 
 Instructions 
   Open Facebook MarketPlace webpage 
