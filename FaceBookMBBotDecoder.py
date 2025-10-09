@@ -6,7 +6,7 @@ import os
 def find(text, location):
     global contents 
     #find text starting from location 
-    position = contents.find(text, location + 1)
+    position = contents.find(text, location+1)
     if position == -1:
         print(str(text)+"NOT FOUND")
         return location
@@ -56,11 +56,11 @@ def main_program():
         contents = file.read()
     i=1
     while (contents.find(f'[{i}]', location) != -1):
-        location+=1
+        
         print(location)
         
         #get Year made
-        location = contents.find(']', location)+1
+        location = find(']', location)+1
         locationend = contents.find(" ", location)
         writeToFile(contents[location:locationend])
         print(location)
@@ -68,7 +68,7 @@ def main_program():
         
 
         #get Brand
-        location = contents.find(" ", location)+1
+        location = find(" ", location)+1
         locationend = contents.find(" ", location)
         writeToFile(contents[location:locationend])
         nextInput()
@@ -77,12 +77,12 @@ def main_program():
         #get name
         location = locationend+1
         writeToFile(contents[location:contents.find("\n", location)])
-        location = contents.find("\n", location)-1
+        location = find("\n", location)-1
         nextInput()
         print(location)
 
         #get Price
-        location = contents.find('$', location)
+        location = find('$', location)
         locationend = contents.find("\n", location)
         writeToFile(contents[location:locationend])
         nextInput()
@@ -90,26 +90,26 @@ def main_program():
 
         #get Mileage
         location = findEnd("Driven ", location)
-        writeToFile(contents[location:contents.find(" ", location)])
+        writeToFile(contents[location:find(" ", location)])
         nextInput() 
         print(location)
 
         #get Exterior color
         location = findEnd("Exterior color: ", location)
-        writeToFile(contents[location:contents.find(" ", location)])
+        writeToFile(contents[location:find(" ", location)])
         nextInput()
         print(location)
 
         #get Interior color
         location = findEnd("Interior color:", location)+1
-        locationend = contents.find("\n", location)
+        locationend = find("\n", location)
         writeToFile(contents[location:locationend])
         nextInput()
         print(location)
 
         #get link
         location = findEnd("{", location)
-        locationend =contents.find("}", location)
+        locationend = find("}", location)
         writeToFile(contents[location:locationend])
         
         nextInput()
